@@ -85,9 +85,9 @@
 </head>
 <body>
   <div class="container">
-    <h1>Exchange Your Item</h1>
+    <h1>Give It For Free</h1>
     <p class="description">
-      Exchange your item and receive another one absolutely free!
+      If you have items you no longer use but are still in good condition, consider giving them to someone in need. What may be useless to you could be a blessing for someone else.
     </p>
 
     <form id="itemForm">
@@ -107,6 +107,35 @@
     const form = document.getElementById('itemForm');
     const itemsList = document.getElementById('itemsList');
 
+    let items = JSON.parse(localStorage.getItem('items')) || [];
+
+    function renderItems() {
+      itemsList.innerHTML = '';
+      items.forEach((item, index) => {
+        const itemCard = document.createElement('div');
+        itemCard.className = 'card';
+        itemCard.innerHTML = `
+          ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}" />` : ''}
+          <h2>Name: ${item.name}</h2>
+          <h3>Item: ${item.title}</h3>
+          <p>Description: ${item.description}</p>
+          <p>Phone: ${item.phone}</p>
+          ${item.exchange ? `<p><strong>Wants in exchange:</strong> ${item.exchange}</p>` : ''}
+          <button class="delete-btn" data-index="${index}">Delete</button>
+        `;
+        itemsList.prepend(itemCard);
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = btn.getAttribute('data-index');
+          items.splice(index, 1);
+          localStorage.setItem('items', JSON.stringify(items));
+          renderItems();
+        });
+      });
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
@@ -122,28 +151,15 @@
         imageUrl = URL.createObjectURL(imageInput.files[0]);
       }
 
-      const itemCard = document.createElement('div');
-      itemCard.className = 'card';
+      const newItem = { name, title, description, phone, exchange, imageUrl };
+      items.push(newItem);
+      localStorage.setItem('items', JSON.stringify(items));
 
-      const content = `
-        ${imageUrl ? `<img src="${imageUrl}" alt="${title}" />` : ''}
-        <h2>Name: ${name}</h2>
-        <h3>Item: ${title}</h3>
-        <p>Description: ${description}</p>
-        <p>Phone: ${phone}</p>
-        ${exchange ? `<p><strong>Wants in exchange:</strong> ${exchange}</p>` : ''}
-        <button class="delete-btn">Delete</button>
-      `;
-
-      itemCard.innerHTML = content;
-
-      itemCard.querySelector('.delete-btn').addEventListener('click', () => {
-        itemCard.remove();
-      });
-
-      itemsList.prepend(itemCard);
+      renderItems();
       form.reset();
     });
+
+    renderItems();
   </script>
 </body>
 </html>
