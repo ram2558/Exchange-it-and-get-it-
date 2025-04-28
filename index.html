@@ -85,9 +85,9 @@
 </head>
 <body>
   <div class="container">
-    <h1>Give It For Free</h1>
+    <h1>Exchange Your Item</h1>
     <p class="description">
-      If you have items you no longer use but are still in good condition, consider giving them to someone in need. What may be useless to you could be a blessing for someone else.
+      Exchange your item and receive another one absolutely free!
     </p>
 
     <form id="itemForm">
@@ -106,7 +106,6 @@
   <script>
     const form = document.getElementById('itemForm');
     const itemsList = document.getElementById('itemsList');
-
     let items = JSON.parse(localStorage.getItem('items')) || [];
 
     function renderItems() {
@@ -145,17 +144,26 @@
       const phone = document.getElementById('phone').value;
       const exchange = document.getElementById('exchange').value;
       const imageInput = document.getElementById('image');
-      let imageUrl = '';
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const imageUrl = reader.result;
+        const newItem = { name, title, description, phone, exchange, imageUrl };
+        items.push(newItem);
+        localStorage.setItem('items', JSON.stringify(items));
+        renderItems();
+      };
 
       if (imageInput.files[0]) {
-        imageUrl = URL.createObjectURL(imageInput.files[0]);
+        reader.readAsDataURL(imageInput.files[0]); // Save image as Base64
+      } else {
+        const imageUrl = '';
+        const newItem = { name, title, description, phone, exchange, imageUrl };
+        items.push(newItem);
+        localStorage.setItem('items', JSON.stringify(items));
+        renderItems();
       }
 
-      const newItem = { name, title, description, phone, exchange, imageUrl };
-      items.push(newItem);
-      localStorage.setItem('items', JSON.stringify(items));
-
-      renderItems();
       form.reset();
     });
 
