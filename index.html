@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Give It For Free</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7fafc;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2d3748;
+    }
+    p.description {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4a5568;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+    input, textarea, button {
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #3182ce;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #2b6cb0;
+    }
+    .items {
+      display: grid;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      position: relative;
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background-color: #c53030;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exchange Your Item</h1>
+    <p class="description">
+      Exchange your item and receive another one absolutely free!
+    </p>
+
+    <form id="itemForm">
+      <input type="text" id="name" placeholder="Your Name" required />
+      <input type="text" id="title" placeholder="Item Title" required />
+      <textarea id="description" placeholder="Item Description" required></textarea>
+      <input type="text" id="phone" placeholder="Your Phone Number" required />
+      <input type="text" id="exchange" placeholder="What do you want in exchange? (optional)" />
+      <input type="file" id="image" accept="image/*" />
+      <button type="submit">Post Item</button>
+    </form>
+
+    <div class="items" id="itemsList"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('itemForm');
+    const itemsList = document.getElementById('itemsList');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const phone = document.getElementById('phone').value;
+      const exchange = document.getElementById('exchange').value;
+      const imageInput = document.getElementById('image');
+      let imageUrl = '';
+
+      if (imageInput.files[0]) {
+        imageUrl = URL.createObjectURL(imageInput.files[0]);
+      }
+
+      const itemCard = document.createElement('div');
+      itemCard.className = 'card';
+
+      const content = `
+        ${imageUrl ? `<img src="${imageUrl}" alt="${title}" />` : ''}
+        <h2>Name: ${name}</h2>
+        <h3>Item: ${title}</h3>
+        <p>Description: ${description}</p>
+        <p>Phone: ${phone}</p>
+        ${exchange ? `<p><strong>Wants in exchange:</strong> ${exchange}</p>` : ''}
+        <button class="delete-btn">Delete</button>
+      `;
+
+      itemCard.innerHTML = content;
+
+      itemCard.querySelector('.delete-btn').addEventListener('click', () => {
+        itemCard.remove();
+      });
+
+      itemsList.prepend(itemCard);
+      form.reset();
+    });
+  </script>
+</body>
+</html>
