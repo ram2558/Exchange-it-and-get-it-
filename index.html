@@ -106,7 +106,23 @@
   <script>
     const form = document.getElementById('itemForm');
     const itemsList = document.getElementById('itemsList');
-    let items = JSON.parse(localStorage.getItem('items')) || [];
+    let items = [];
+
+    // Load items safely
+    try {
+      items = JSON.parse(localStorage.getItem('items')) || [];
+    } catch (error) {
+      console.error('Could not load saved items:', error);
+      items = [];
+    }
+
+    function saveItems() {
+      try {
+        localStorage.setItem('items', JSON.stringify(items));
+      } catch (error) {
+        console.error('Could not save items:', error);
+      }
+    }
 
     function renderItems() {
       itemsList.innerHTML = '';
@@ -125,11 +141,12 @@
         itemsList.prepend(itemCard);
       });
 
+      // Attach delete buttons
       document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const index = btn.getAttribute('data-index');
           items.splice(index, 1);
-          localStorage.setItem('items', JSON.stringify(items));
+          saveItems();
           renderItems();
         });
       });
@@ -145,28 +162,27 @@
       const exchange = document.getElementById('exchange').value;
       const imageInput = document.getElementById('image');
 
-      const reader = new FileReader();
-      reader.onload = function () {
-        const imageUrl = reader.result;
-        const newItem = { name, title, description, phone, exchange, imageUrl };
-        items.push(newItem);
-        localStorage.setItem('items', JSON.stringify(items));
-        renderItems();
-      };
+      const newItem = { name, title, description, phone, exchange, imageUrl: '' };
 
       if (imageInput.files[0]) {
-        reader.readAsDataURL(imageInput.files[0]); // Save image as Base64
+        const reader = new FileReader();
+        reader.onload = function () {
+          newItem.imageUrl = reader.result;
+          items.push(newItem);
+          saveItems();
+          renderItems();
+        };
+        reader.readAsDataURL(imageInput.files[0]);
       } else {
-        const imageUrl = '';
-        const newItem = { name, title, description, phone, exchange, imageUrl };
         items.push(newItem);
-        localStorage.setItem('items', JSON.stringify(items));
+        saveItems();
         renderItems();
       }
 
       form.reset();
     });
 
+    // Initial rendering
     renderItems();
   </script>
 </body>
